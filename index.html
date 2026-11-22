@@ -122,7 +122,7 @@ label.f .req{color:var(--red)} label.f .hint{font-weight:500;color:var(--ink2);f
 </nav>
 <script>
 'use strict';
-const APP_VERSION='v1.2.0';
+const APP_VERSION='v1.3.0';
 const DEFAULT_CATS=['市場判讀','總經利率','產業','個股','投資心法'];
 const RATES=['說中','部分','沒說中','還看不出'];
 let CARDS=[],CATS=DEFAULT_CATS.slice();
@@ -201,7 +201,7 @@ function renderList(hist){const base=CARDS.filter(c=>!!c.archived===hist);
   let h='';
   if(FS||FP){const t={};RATES.forEach(r=>t[r]=0);let none=0;res.forEach(c=>c.rating?t[c.rating]++:none++);
     h+=`<div class="tally">${esc(FP||FS)}｜說中 ${t['說中']}・部分 ${t['部分']}・沒說中 ${t['沒說中']}・還看不出 ${t['還看不出']}・未評 ${none}</div>`;}
-  h+=res.map(c=>`<button class="row" data-open="${c.id}"><span class="d">${esc(c.date.slice(2))}${c.dateApprox?'<i>約</i>':''}</span><span class="c">${esc(c.cat)}</span><span class="t">${esc(c.title)}${c.type==='deck'?`<span class="bdg">簡報・${c.images.length}頁</span>`:''}${c.rating?`<span class="bdg rt-${c.rating}">${c.rating}</span>`:''}</span></button>`).join('');
+  h+=res.map(c=>`<button class="row" data-open="${c.id}"><span class="d">${esc(c.date.slice(2))}${c.type==='deck'?'<i>簡</i>':''}</span><span class="c">${esc(c.cat)}</span><span class="t">${esc(c.title)}${c.type==='deck'?`<span class="bdg">${c.images.length}頁</span>`:''}${c.rating?`<span class="bdg rt-${c.rating}">${c.rating}</span>`:''}</span></button>`).join('');
   if(!res.length)h+=`<div class="empty">${base.length?'沒有符合的資料。':hist?'歷史區還沒有資料。開啟一筆資料後按「移到歷史」，就會收到這裡。':'還沒有資料。'}</div>`;
   if(!hist&&!CARDS.length)h+=`<div class="btns">${syncOn()?'<button class="btn pri" id="cloudRestore">從 Google Sheets 還原</button>':''}<a class="btn ${syncOn()?'':'pri'}" href="#/new">新增第一筆</a></div>`;
   h+=`<div class="ver">${APP_VERSION}｜首頁 ${CARDS.filter(c=>!c.archived).length} 筆・歷史 ${CARDS.filter(c=>c.archived).length} 筆<br><span data-sync>${syncText()}</span></div>`;
