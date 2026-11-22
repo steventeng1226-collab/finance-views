@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1A2B">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>財經觀點庫</title>
+<style>
+:root{--ink:#0E1A2B;--ink2:#3A4A60;--bg:#FFFFFF;--surf:#EEF1F5;--line:#C3CCD8;--act:#1747C2;--actbg:#E3EAFB;--red:#B91C1C;--redbg:#FDE2E2;--grn:#14532D;--grnbg:#DCF3E3;--amb:#7A4B00;--ambbg:#FCEBC7}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.5 "Noto Sans TC","Noto Sans CJK TC",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+header.top h1{font-size:17px;margin:0;flex:1;font-weight:700}
+header.top .back{background:none;border:0;color:#fff;font-size:22px;padding:0 8px 0 0;line-height:1}
+main{padding:8px 12px calc(76px + env(safe-area-inset-bottom,0px));max-width:760px;margin:0 auto}
+nav.bot{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1.5px solid var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.bot a{flex:1;text-align:center;padding:7px 0 8px;color:var(--ink2);text-decoration:none;font-size:13px;font-weight:700}
+nav.bot a b{display:block;font-size:17px;line-height:1.2}
+nav.bot a.on{color:var(--act);box-shadow:inset 0 3px 0 var(--act)}
+.search{display:flex;gap:6px;padding:4px 0}
+.search input{flex:1;min-width:0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 6px}
+.chip{flex:none;border:1.5px solid var(--ink2);border-radius:999px;padding:2px 11px;background:#fff;font-weight:700;font-size:14px}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:0 0 4px}
+.filt select{padding:5px 6px;font-size:13px}
+.filt select.on{border-color:var(--act);background:var(--actbg);font-weight:700}
+.tally{background:var(--surf);border-radius:8px;padding:6px 10px;font-weight:700;font-size:14px;margin:2px 0 4px}
+.row{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid var(--line);padding:9px 2px;cursor:pointer}
+.row .d{flex:none;color:var(--ink2);font-size:13px;font-variant-numeric:tabular-nums}
+.row .d i{font-style:normal;color:var(--amb);font-weight:700;margin-left:1px}
+.row .c{flex:none;background:var(--ink);color:#fff;border-radius:5px;padding:0 6px;font-size:13px;font-weight:700}
+.row .t{flex:1;font-size:15px;font-weight:700;line-height:1.4}
+.bdg{display:inline-block;border:1.5px solid var(--ink2);border-radius:5px;padding:0 5px;font-size:12px;font-weight:700;margin-left:5px;vertical-align:1px;color:var(--ink2)}
+.rt-說中{border-color:var(--grn);color:var(--grn);background:var(--grnbg)}
+.rt-沒說中{border-color:var(--red);color:var(--red);background:var(--redbg)}
+.rt-部分{border-color:var(--amb);color:var(--amb);background:var(--ambbg)}
+.empty{color:var(--ink2);padding:12px 0}
+select,input[type=text],input[type=url],input[type=number],input[type=date],input[type=search],input[type=password],textarea{width:100%;padding:8px 9px;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-size:15px}
+textarea{min-height:70px}
+select:focus,input:focus,textarea:focus{outline:2px solid var(--act);border-color:var(--act)}
+label.f{display:block;margin-top:10px;font-weight:700;font-size:14px}
+label.f .req{color:var(--red)} label.f .hint{font-weight:500;color:var(--ink2);font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.sec{border:1.5px solid var(--ink);border-radius:10px;padding:2px 12px 12px;margin:12px 0}
+.sec>.st{margin:-2px -12px 8px;padding:6px 12px;background:var(--ink);color:#fff;font-weight:700;border-radius:8px 8px 0 0;display:flex;gap:8px;align-items:center}
+.sec>.st small{font-weight:500;font-size:12px;opacity:.85;flex:1;text-align:right}
+.btn{border:1.5px solid var(--ink);background:#fff;border-radius:8px;padding:7px 13px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;color:var(--ink);display:inline-block}
+.btn.pri{background:var(--act);border-color:var(--act);color:#fff}
+.btn.dan{border-color:var(--red);color:var(--red)}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn:disabled{opacity:.5}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.thumbs{display:flex;gap:6px;overflow-x:auto;padding:6px 0}
+.thumbs img{height:110px;border:1.5px solid var(--ink);border-radius:6px;display:block;background:var(--surf)}
+.alert{border-left:5px solid var(--red);background:var(--redbg);color:var(--red);padding:8px 10px;border-radius:5px;margin:6px 0;font-weight:700;font-size:14px}
+.info{border-left:5px solid var(--act);background:var(--actbg);color:var(--ink);padding:8px 10px;border-radius:5px;margin:8px 0;font-weight:700;font-size:14px}
+.note{color:var(--ink2);font-size:13px;margin-top:6px}
+.ver{text-align:center;color:var(--ink2);margin-top:20px;font-size:13px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:8px;font-weight:700;z-index:90;max-width:90vw;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(14,26,43,.55);z-index:50;display:flex;align-items:flex-end}
+.modal .box{background:#fff;width:100%;max-height:85vh;overflow:auto;border-radius:14px 14px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px))}
+.viewer{position:fixed;inset:0;background:#000;z-index:70;touch-action:none;overflow:hidden}
+.viewer img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;user-select:none;-webkit-user-drag:none}
+.viewer .bar{position:absolute;left:0;right:0;top:0;display:flex;gap:6px;padding:8px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:rgba(0,0,0,.65);z-index:2;align-items:center}
+.viewer .bar button{background:#fff;color:#000;border:0;border-radius:7px;padding:6px 11px;font-weight:700;font-size:14px}
+.viewer .bar span{color:#fff;flex:1;text-align:center;font-weight:700;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cats li{display:flex;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}
+.cats ul{list-style:none;padding:0;margin:4px 0}.cats .nm{flex:1;font-weight:700}
+.vmeta{color:var(--ink2);font-size:14px;font-weight:700;margin-top:4px}
+.vmeta i{font-style:normal;color:var(--amb)}
+.vt{font-size:19px;line-height:1.4;margin:4px 0 6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:14px;margin:4px 0 8px}
+.kv b{color:var(--ink2)} .kv span{font-weight:700;word-break:break-all}
+.kv a{color:var(--act)}
+.big{display:block;width:100%;border:1.5px solid var(--ink);border-radius:8px;background:var(--surf)}
+.pager{display:flex;gap:6px;align-items:center;margin:6px 0}
+.pager span{flex:1;text-align:center;font-weight:700}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.pgrid button{border:1.5px solid var(--line);border-radius:6px;padding:0;background:var(--surf);position:relative}
+.pgrid button.on{border-color:var(--act);outline:2px solid var(--act)}
+.pgrid img{width:100%;display:block;border-radius:5px}
+.pgrid b{position:absolute;left:3px;top:3px;background:var(--ink);color:#fff;font-size:12px;border-radius:4px;padding:0 5px}
+.rates{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rates button{border:1.5px solid var(--ink2);border-radius:8px;background:#fff;padding:8px 0;font-weight:700;font-size:14px}
+.rates button.on.rt-說中{background:var(--grn);border-color:var(--grn);color:#fff}
+.rates button.on.rt-沒說中{background:var(--red);border-color:var(--red);color:#fff}
+.rates button.on.rt-部分{background:var(--amb);border-color:var(--amb);color:#fff}
+.rates button.on.rt-還看不出{background:var(--ink);border-color:var(--ink);color:#fff}
+.notes .nt{border-bottom:1px solid var(--line);padding:6px 0;display:flex;gap:8px;align-items:flex-start}
+.notes .nt .d{flex:none;color:var(--ink2);font-size:13px;font-weight:700;padding-top:1px}
+.notes .nt .t{flex:1;white-space:pre-wrap;font-size:15px}
+.notes .nt button{flex:none;border:0;background:none;color:var(--red);font-weight:700;font-size:13px}
+.mm .lv{font-size:13px;font-weight:700;color:var(--ink2);margin:8px 0 3px}
+.mm .box{border:1.5px solid var(--ink2);border-radius:8px;padding:7px 10px;font-weight:700;background:var(--surf)}
+.mm .ex{display:grid;gap:6px}
+.mm .ex .box{background:#fff;border-color:var(--act)}
+.mm .ex .vf{display:block;font-weight:500;font-size:13px;color:var(--ink2);margin-top:3px;border-top:1px dashed var(--line);padding-top:3px}
+.mm .cc{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mm .pr{background:var(--ambbg);border-color:var(--amb);color:var(--amb)}
+.mm .arr{text-align:center;color:var(--ink2);line-height:1;font-size:15px}
+.aiv{border:1.5px solid var(--act);border-radius:8px;background:var(--actbg);padding:6px 10px 8px;margin:8px 0 0}
+.aiv .h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--act);margin-bottom:2px}
+.aiv .h span{flex:1}.aiv .h button{border:1px solid var(--act);background:#fff;color:var(--act);border-radius:6px;font-size:12px;font-weight:700;padding:1px 7px}
+.aiv ul{margin:0;padding-left:16px;font-size:13px;line-height:1.55;font-weight:500}
+.chk{display:flex;align-items:center;gap:5px;font-weight:700;font-size:14px;margin-top:6px}
+.chk input{width:20px;height:20px}
+.prog{font-weight:700;color:var(--act);margin:6px 0}
+</style>
+</head>
+<body>
+<header class="top"><button class="back" id="backBtn" hidden aria-label="返回">‹</button><h1 id="ttl">財經觀點庫</h1></header>
+<main id="main"></main>
+<nav class="bot">
+<a href="#/home" data-r="home"><b>⌂</b>首頁</a>
+<a href="#/history" data-r="history"><b>▤</b>歷史</a>
+<a href="#/new" data-r="new"><b>＋</b>新增</a>
+<a href="#/settings" data-r="settings"><b>⚙</b>設定</a>
+</nav>
+<script>
+'use strict';
+const APP_VERSION='v1.2.0';
+const DEFAULT_CATS=['市場判讀','總經利率','產業','個股','投資心法'];
+const RATES=['說中','部分','沒說中','還看不出'];
+let CARDS=[],CATS=DEFAULT_CATS.slice();
+const IMG=new Map();
+let AI={gemini:'',claude:'',gModel:'gemini-flash-latest',cModel:'claude-sonnet-5-5'};
+
+/* ---------- IndexedDB ---------- */
+let db;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('finview',1);
+  r.onupgradeneeded=()=>{const d=r.result;for(const[s,k]of[['cards','id'],['images','id'],['kv','k']])if(!d.objectStoreNames.contains(s))d.createObjectStore(s,{keyPath:k});};
+  r.onsuccess=()=>{db=r.result;res(db)};r.onerror=()=>rej(r.error);});}
+function rq(r){return new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+const os=(s,m='readonly')=>db.transaction(s,m).objectStore(s);
+const DB={all:s=>rq(os(s).getAll()),get:(s,k)=>rq(os(s).get(k)),put:(s,v)=>rq(os(s,'readwrite').put(v)),del:(s,k)=>rq(os(s,'readwrite').delete(k)),clear:s=>rq(os(s,'readwrite').clear())};
+async function saveCats(){await DB.put('kv',{k:'cats',v:CATS});SYNC.catsDirty=true;await saveSync();scheduleFlush();}
+async function saveCard(c,quiet){c.updatedAt=Date.now();await DB.put('cards',c);const i=CARDS.findIndex(x=>x.id===c.id);if(i>=0)CARDS[i]=c;else CARDS.push(c);queueCard(c.id);}
+async function getImg(id){if(IMG.has(id))return IMG.get(id);const r=await DB.get('images',id);const d=r?r.data:'';if(d)IMG.set(id,d);return d;}
+async function putImg(id,data){IMG.set(id,data);await DB.put('images',{id,data});}
+const saveAI=()=>DB.put('kv',{k:'ai',v:AI});
+
+/* ---------- helpers ---------- */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>ymd(new Date());
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+function toast(t,ms){document.querySelectorAll('.toast').forEach(e=>e.remove());const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),ms||2200);}
+const cardById=id=>CARDS.find(c=>c.id===id);
+const stripExt=n=>String(n||'').replace(/\.[A-Za-z0-9]{2,5}$/,'').replace(/[_]+/g,' ').trim();
+const splitNames=s=>String(s||'').split(/[、,，;；\/／]+/).map(x=>x.trim()).filter(Boolean);
+function newCard(){return {id:uid(),type:'img',date:today(),dateApprox:true,dateSrc:'',cat:'',title:'',show:'',speakers:[],event:'',srcCount:'',url:'',
+  rating:'',ratedAt:'',notes:[],mind:null,view:[],viewBy:'',viewAt:'',viewManual:false,mindBy:'',mindAt:'',fileName:'',images:[],archived:false,createdAt:Date.now(),updatedAt:Date.now()};}
+function normCard(c){const n=newCard();for(const k of Object.keys(n))if(c[k]!==undefined&&c[k]!==null)n[k]=c[k];
+  n.id=c.id||n.id;n.speakers=Array.isArray(n.speakers)?n.speakers:splitNames(n.speakers);n.notes=Array.isArray(n.notes)?n.notes:[];
+  n.images=Array.isArray(n.images)?n.images:[];n.view=Array.isArray(n.view)?n.view:[];n.archived=!!n.archived;n.dateApprox=!!n.dateApprox;if(!RATES.includes(n.rating))n.rating='';return n;}
+function normDate(s){const m=String(s||'').trim().match(/^(\d{4})[-\/.年]\s*(\d{1,2})[-\/.月]\s*(\d{1,2})日?$/);if(!m)return '';
+  const y=+m[1],mo=+m[2],d=+m[3];if(y<2000||y>2100||mo<1||mo>12||d<1||d>31)return '';return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;}
+function mindText(m){if(!m)return '';return [m.observe,...(m.explain||[]).flatMap(x=>[x.point,x.verify]),m.conclusion,...(m.premises||[])].filter(Boolean).join(' ');}
+function fileDate(f){const t=f&&f.lastModified;return t?ymd(new Date(t)):today();}
+const typeName=c=>c.type==='deck'?'簡報':'一頁圖';
+
+/* ---------- 路由 ---------- */
+let Q='',FC='',FS='',FP='',FE='';
+function route(){const[,r,id]=(location.hash||'#/home').split('/');
+  const tab=r==='edit'?'new':r==='view'?'':r||'home';
+  document.querySelectorAll('nav.bot a').forEach(a=>a.classList.toggle('on',a.dataset.r===tab));
+  $('#backBtn').hidden=!(r==='edit'||r==='view');
+  window.scrollTo(0,0);
+  if(r==='view')return viewCard(id);
+  if(r==='edit')return viewEdit(id);
+  if(r==='new'){F=null;return viewEdit(null,id==='share');}
+  if(r==='history')return viewList(true);
+  if(r==='settings')return viewSettings();
+  return viewList(false);}
+
+/* ---------- 清單 ---------- */
+function viewList(hist){$('#ttl').textContent=hist?'歷史區':'財經觀點庫';const m=$('#main');
+  m.innerHTML=`<div data-syncbanner>${hist?'':syncBanner()}</div>${hist||aiOn()?'':'<div class="info">尚未設定 AI 金鑰，新增時不會自動產生主旨和思路圖。 <a class="btn sm" href="#/settings">去設定</a></div>'}
+  <div class="search"><input type="search" id="q" placeholder="搜尋主旨、節目、發言人、想法、思路圖…" value="${esc(Q)}" enterkeyhint="search"></div>
+  <div class="chips" id="chips"></div><div class="filt" id="filt"></div><div id="list"></div>`;
+  bindRetry(m);const q=$('#q');q.oninput=()=>{Q=q.value;renderList(hist);};renderList(hist);}
+function opts(vals,cur,label){return `<option value="">${label}</option>`+vals.map(v=>`<option ${v===cur?'selected':''}>${esc(v)}</option>`).join('');}
+function renderList(hist){const base=CARDS.filter(c=>!!c.archived===hist);
+  const cats=['',...CATS,...[...new Set(base.map(c=>c.cat))].filter(x=>x&&!CATS.includes(x))];
+  if(FC&&!cats.includes(FC))FC='';
+  $('#chips').innerHTML=cats.map(c=>{const n=c?base.filter(x=>x.cat===c).length:base.length;return c&&!n?'':`<button class="chip ${FC===c?'on':''}" data-c="${esc(c)}">${esc(c||'全部')} ${n}</button>`;}).join('');
+  $('#chips').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{FC=b.dataset.c;renderList(hist);});
+  const shows=[...new Set(base.map(c=>c.show).filter(Boolean))].sort(),spk=[...new Set(base.flatMap(c=>c.speakers))].sort(),evs=[...new Set(base.map(c=>c.event).filter(Boolean))].sort();
+  if(FS&&!shows.includes(FS))FS='';if(FP&&!spk.includes(FP))FP='';if(FE&&!evs.includes(FE))FE='';
+  const fl=$('#filt');fl.innerHTML=(shows.length||spk.length||evs.length)?`<select id="fS" class="${FS?'on':''}">${opts(shows,FS,'全部節目')}</select><select id="fP" class="${FP?'on':''}">${opts(spk,FP,'全部發言人')}</select><select id="fE" class="${FE?'on':''}">${opts(evs,FE,'全部事件')}</select>`:'';
+  if($('#fS')){$('#fS').onchange=e=>{FS=e.target.value;renderList(hist);};$('#fP').onchange=e=>{FP=e.target.value;renderList(hist);};$('#fE').onchange=e=>{FE=e.target.value;renderList(hist);};}
+  const terms=Q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const hay=c=>[c.title,c.cat,c.date,c.show,c.speakers.join(' '),c.event,c.fileName,c.notes.map(n=>n.t).join(' '),mindText(c.mind),c.view.join(' '),typeName(c)].join(' ').toLowerCase();
+  const res=base.filter(c=>(!FC||c.cat===FC)&&(!FS||c.show===FS)&&(!FP||c.speakers.includes(FP))&&(!FE||c.event===FE)&&terms.every(t=>hay(c).includes(t)))
+    .sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
+  let h='';
+  if(FS||FP){const t={};RATES.forEach(r=>t[r]=0);let none=0;res.forEach(c=>c.rating?t[c.rating]++:none++);
+    h+=`<div class="tally">${esc(FP||FS)}｜說中 ${t['說中']}・部分 ${t['部分']}・沒說中 ${t['沒說中']}・還看不出 ${t['還看不出']}・未評 ${none}</div>`;}
+  h+=res.map(c=>`<button class="row" data-open="${c.id}"><span class="d">${esc(c.date.slice(2))}${c.dateApprox?'<i>約</i>':''}</span><span class="c">${esc(c.cat)}</span><span class="t">${esc(c.title)}${c.type==='deck'?`<span class="bdg">簡報・${c.images.length}頁</span>`:''}${c.rating?`<span class="bdg rt-${c.rating}">${c.rating}</span>`:''}</span></button>`).join('');
+  if(!res.length)h+=`<div class="empty">${base.length?'沒有符合的資料。':hist?'歷史區還沒有資料。開啟一筆資料後按「移到歷史」，就會收到這裡。':'還沒有資料。'}</div>`;
+  if(!hist&&!CARDS.length)h+=`<div class="btns">${syncOn()?'<button class="btn pri" id="cloudRestore">從 Google Sheets 還原</button>':''}<a class="btn ${syncOn()?'':'pri'}" href="#/new">新增第一筆</a></div>`;
+  h+=`<div class="ver">${APP_VERSION}｜首頁 ${CARDS.filter(c=>!c.archived).length} 筆・歷史 ${CARDS.filter(c=>c.archived).length} 筆<br><span data-sync>${syncText()}</span></div>`;
+  const L=$('#list');L.innerHTML=h;L.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>location.hash='#/view/'+b.dataset.open);
+  if($('#cloudRestore'))$('#cloudRestore').onclick=restoreCloud;}
+
+/* ---------- 單筆檢視 ---------- */
+let VPAGE=0,VGRID=false;
+async function viewCard(id){const c=cardById(id);const m=$('#main');if(!c){m.innerHTML='<div class="empty">找不到這筆資料。</div>';return;}
+  $('#ttl').textContent=typeName(c);if(m.dataset.vid!==id){VPAGE=0;VGRID=false;}m.dataset.vid=id;
+  const urls=await Promise.all(c.images.map(getImg));const n=urls.length;if(VPAGE>=n)VPAGE=0;
+  const sp=c.speakers.join('、');
+  let imgH='';
+  if(!n)imgH='<div class="empty">這筆沒有圖片。</div>';
+  else if(!urls.some(Boolean))imgH='<div class="alert">這支手機上找不到圖片，可到設定頁「從 Google Sheets 還原」。</div>';
+  else if(c.type==='deck'){imgH=`<div class="pager"><button class="btn sm" id="pPrev">‹ 上一頁</button><span>${VPAGE+1} / ${n}</span><button class="btn sm" id="pNext">下一頁 ›</button><button class="btn sm" id="pGrid">${VGRID?'單頁':'縮圖'}</button></div>`+
+    (VGRID?`<div class="pgrid">${urls.map((u,i)=>`<button data-pg="${i}" class="${i===VPAGE?'on':''}"><img src="${u}" alt="" loading="lazy"><b>${i+1}</b></button>`).join('')}</div>`:`<img class="big" id="bigImg" src="${urls[VPAGE]}" alt="">`);}
+  else imgH=`<img class="big" id="bigImg" src="${urls[0]}" alt="">`;
+  m.innerHTML=`<div class="vmeta">${esc(c.date)}${c.dateApprox?'<i>（約）</i>':''}・${esc(c.cat)}・${typeName(c)}${c.type==='deck'?`・${n} 頁`:''}</div>
+  <h2 class="vt">${esc(c.title)}</h2>
+  <div class="kv">${c.show?`<b>節目</b><span>${esc(c.show)}</span>`:''}${sp?`<b>發言人</b><span>${esc(sp)}</span>`:''}${c.event?`<b>事件</b><span>${esc(c.event)}</span>`:''}${c.srcCount?`<b>來源數</b><span>${esc(c.srcCount)} 個</span>`:''}${c.url?`<b>影片</b><span><a href="${esc(c.url)}" target="_blank" rel="noopener">開啟原始影片</a></span>`:''}</div>
+  ${imgH}
+  <div class="aiv"><div class="h"><span>AI 看法${c.view.length?`・${esc(c.viewBy||c.mindBy)}${c.viewAt?'・'+esc(c.viewAt):''}`:''}</span><button id="vPaste">貼上</button><button id="vGen">${c.view.length?'重新產生':'產生'}</button></div>
+    ${c.view.length?`<ul>${c.view.slice(0,5).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<div class="note" style="margin:0">還沒有 AI 看法。</div>'}<div class="note" id="vMsg" style="display:none;margin:2px 0 0"></div></div>
+  <div class="sec"><div class="st">事後評分<small>${c.ratedAt?'評於 '+esc(c.ratedAt):'他們說得準不準？'}</small></div><div class="rates">${RATES.map(r=>`<button class="rt-${r} ${c.rating===r?'on':''}" data-rate="${r}">${r}</button>`).join('')}</div></div>
+  <div class="sec notes"><div class="st">我的想法<small>可以一直追加</small></div>
+    ${c.notes.map((x,i)=>`<div class="nt"><span class="d">${esc(x.d.slice(5))}</span><span class="t">${esc(x.t)}</span><button data-ndel="${i}">刪</button></div>`).join('')||'<div class="note" style="margin:0 0 6px">還沒有寫。</div>'}
+    <textarea id="nTxt" placeholder="${c.notes.length?'事後看：…':'我的判斷：…'}"></textarea><div class="btns" style="margin-top:6px"><button class="btn pri" id="nAdd">加一句</button></div></div>
+  <div class="sec"><div class="st">思路圖<small>${c.mind?`AI 整理・${esc(c.mindBy)}${c.mindAt?'・'+esc(c.mindAt):''}`:''}</small></div><div id="mmBox">${c.mind?mindHtml(c.mind):'<div class="note" style="margin:0">還沒有思路圖。</div>'}</div>
+    <div class="note" id="mmMsg" style="display:none"></div><div class="btns"><button class="btn" id="mmGen">${c.mind?'重新產生':'產生思路圖'}</button></div></div>
+  <div class="btns"><a class="btn" href="#/edit/${c.id}">編輯資料</a><button class="btn" id="vArch">${c.archived?'移回首頁':'移到歷史'}</button></div>`;
+  const big=$('#bigImg');if(big)big.onclick=()=>openViewer(c,urls,c.type==='deck'?VPAGE:0);
+  if($('#pPrev')){$('#pPrev').onclick=()=>{VPAGE=(VPAGE-1+n)%n;viewCard(id);};$('#pNext').onclick=()=>{VPAGE=(VPAGE+1)%n;viewCard(id);};$('#pGrid').onclick=()=>{VGRID=!VGRID;viewCard(id);};}
+  m.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{VPAGE=+b.dataset.pg;VGRID=false;viewCard(id);});
+  m.querySelectorAll('[data-rate]').forEach(b=>b.onclick=async()=>{const r=b.dataset.rate;c.rating=c.rating===r?'':r;c.ratedAt=c.rating?today():'';await saveCard(c);viewCard(id);});
+  $('#nAdd').onclick=async()=>{const t=$('#nTxt').value.trim();if(!t){toast('請先寫一句');return;}c.notes.push({d:today(),t});await saveCard(c);toast('已加入');viewCard(id);};
+  m.querySelectorAll('[data-ndel]').forEach(b=>b.onclick=async()=>{if(!confirm('刪除這一句？'))return;c.notes.splice(+b.dataset.ndel,1);await saveCard(c);viewCard(id);});
+  $('#vArch').onclick=async()=>{c.archived=!c.archived;await saveCard(c);toast(c.archived?'已移到歷史區':'已移回首頁');location.hash=c.archived?'#/history':'#/home';};
+  const regen=async(btnId,msgId)=>{if(!aiOn()){alert('請先到設定頁填寫 Gemini 或 Claude 的金鑰。');return;}
+    let keepView=false;
+    if(c.viewManual&&c.view.length)keepView=!confirm('目前的 AI 看法是你貼上的「Claude 對話」版本。\n按「確定」：一起換成 AI 新產生的版本\n按「取消」：保留貼上的看法，只更新思路圖');
+    else if((c.mind||c.view.length)&&!confirm('重新產生會同時取代目前的「AI 看法」和「思路圖」，確定？'))return;
+    const btn=$(btnId),msg=$(msgId);btn.disabled=true;msg.style.display='';msg.textContent='AI 分析中…'+(n>5?`（${n} 頁，約需 1 分鐘）`:'');
+    try{const all=(await Promise.all(c.images.map(getImg))).filter(Boolean);if(!all.length)throw new Error('手機上找不到圖片');
+      const {by,r}=await aiAnalyze(all,c.type,c.fileName);c.mind=r.mind;c.mindBy=by;c.mindAt=today();if(!keepView){c.view=r.view;c.viewBy=by;c.viewAt=today();c.viewManual=false;}await saveCard(c);toast(keepView?'思路圖已更新':'AI 看法與思路圖已更新');viewCard(id);}
+    catch(e){btn.disabled=false;msg.textContent='產生失敗：'+e.message;}};
+  $('#mmGen').onclick=()=>regen('#mmGen','#mmMsg');$('#vGen').onclick=()=>regen('#vGen','#vMsg');$('#vPaste').onclick=()=>pasteView(c);}
+function viewLines(t){return String(t||'').split(/\r?\n+/).map(x=>x.replace(/^\s*(?:[-*•・●▪︎]|\d+[.、)）]|[①-⑨])\s*/,'').trim()).filter(Boolean).slice(0,5);}
+async function pasteView(c){let clip='';try{clip=await navigator.clipboard.readText();}catch(e){}
+  const b=document.createElement('div');b.className='modal';
+  b.innerHTML=`<div class="box"><div style="font-weight:700;margin-bottom:6px">貼上 Claude 對話裡的看法</div><div class="note" style="margin:0 0 6px">一行一點，最多 5 行，會取代目前的 AI 看法。</div>
+  <textarea id="pvT" style="min-height:160px" placeholder="長按貼上"></textarea><div class="note" id="pvN"></div><div class="btns"><button class="btn pri" id="pvS" style="flex:1">儲存</button><button class="btn" id="pvC">取消</button></div></div>`;
+  document.body.appendChild(b);const ta=b.querySelector('#pvT'),nn=b.querySelector('#pvN');ta.value=clip;
+  const cnt=()=>{const L=viewLines(ta.value);const all=String(ta.value).split(/\r?\n+/).filter(x=>x.trim()).length;nn.textContent=L.length?`會存 ${L.length} 行${all>5?`（超過 5 行，只取前 5 行）`:''}`:'';};
+  ta.oninput=cnt;cnt();b.querySelector('#pvC').onclick=()=>b.remove();
+  b.querySelector('#pvS').onclick=async()=>{const L=viewLines(ta.value);if(!L.length){alert('還沒有貼上內容。');return;}
+    if(c.view.length&&!c.viewManual&&!confirm('取代 AI 產生的看法？'))return;
+    c.view=L;c.viewBy='Claude 對話';c.viewAt=today();c.viewManual=true;await saveCard(c);b.remove();toast('已存入');viewCard(c.id);};}
+function mindHtml(m){const ex=(m.explain||[]);
+  return `<div class="mm"><div class="lv">① 看到什麼</div><div class="box">${esc(m.observe)}</div><div class="arr">↓</div>
+  <div class="lv">② 怎麼解釋　③ 要驗證什麼</div><div class="ex">${ex.map((x,i)=>`<div class="box">${i+1}. ${esc(x.point)}${x.verify?`<span class="vf">要驗證：${esc(x.verify)}</span>`:''}</div>`).join('')}</div><div class="arr">↓</div>
+  <div class="lv">④ 結論</div><div class="box cc">${esc(m.conclusion)}</div>
+  ${(m.premises||[]).length?`<div class="lv">沒講出來的前提（可以挑戰的地方）</div>${m.premises.map(p=>`<div class="box pr" style="margin-bottom:5px">${esc(p)}</div>`).join('')}`:''}</div>`;}
+
+/* ---------- 圖片檢視（放大） ---------- */
+function openViewer(c,urls,start){let idx=start||0;const v=document.createElement('div');v.className='viewer';
+  v.innerHTML=`<div class="bar"><button id="vx">關閉</button><span id="vn"></span><button id="vr">旋轉</button>${urls.length>1?'<button id="vp">‹</button><button id="vnx">›</button>':''}</div><img id="vi" alt="">`;
+  document.body.appendChild(v);const img=v.querySelector('#vi');let s=1,tx=0,ty=0;const P=new Map();let st=null,lastTap=0;const BAR=52;
+  const close=()=>{v.remove();window.removeEventListener('popstate',onPop);if(c.type==='deck'&&VPAGE!==idx){VPAGE=idx;route();}};
+  const onPop=()=>close();history.pushState({viewer:1},'');window.addEventListener('popstate',onPop);
+  const apply=()=>{img.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;};
+  const fit=()=>{const W=v.clientWidth,H=v.clientHeight-BAR,iw=img.naturalWidth,ih=img.naturalHeight;if(!iw)return;
+    const b=Math.min(W/iw,H/ih),w=iw*b,h=ih*b;img.style.width=w+'px';img.style.height=h+'px';s=1;tx=(W-w)/2;ty=BAR+(H-h)/2;apply();};
+  const rotate=()=>{const cv=document.createElement('canvas');cv.width=img.naturalHeight;cv.height=img.naturalWidth;const g=cv.getContext('2d');
+    g.translate(cv.width,0);g.rotate(Math.PI/2);g.drawImage(img,0,0);img.onload=fit;img.src=cv.toDataURL('image/jpeg',0.92);};
+  const load=i=>{idx=(i+urls.length)%urls.length;img.onload=fit;img.src=urls[idx];v.querySelector('#vn').textContent=(urls.length>1?`${idx+1}/${urls.length}　`:'')+c.title;};
+  v.querySelector('#vx').onclick=()=>history.back();v.querySelector('#vr').onclick=rotate;
+  if(urls.length>1){v.querySelector('#vp').onclick=()=>load(idx-1);v.querySelector('#vnx').onclick=()=>load(idx+1);}
+  function zoomAt(x,y,k){const ns=Math.min(8,Math.max(1,s*k));k=ns/s;tx=x-(x-tx)*k;ty=y-(y-ty)*k;s=ns;if(s===1)fit();else apply();}
+  v.addEventListener('pointerdown',e=>{if(e.target.tagName==='BUTTON')return;v.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(P.size===1){const now=Date.now();if(now-lastTap<300){zoomAt(e.clientX,e.clientY,s>1?1/s:2.5);lastTap=0;}else lastTap=now;}
+    st={s,tx,ty,pts:[...P.values()].map(p=>({...p}))};});
+  v.addEventListener('pointermove',e=>{if(!P.has(e.pointerId)||!st)return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});const pts=[...P.values()];
+    if(pts.length>=2&&st.pts.length>=2){const d0=Math.hypot(st.pts[0].x-st.pts[1].x,st.pts[0].y-st.pts[1].y)||1,d1=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      const c0={x:(st.pts[0].x+st.pts[1].x)/2,y:(st.pts[0].y+st.pts[1].y)/2},c1={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2};
+      const ns=Math.min(8,Math.max(1,st.s*d1/d0)),k=ns/st.s;s=ns;tx=c1.x-(c0.x-st.tx)*k;ty=c1.y-(c0.y-st.ty)*k;apply();}
+    else if(pts.length===1&&s>1){tx=st.tx+pts[0].x-st.pts[0].x;ty=st.ty+pts[0].y-st.pts[0].y;apply();}});
+  const up=e=>{if(!P.has(e.pointerId))return;const p0=st&&st.pts[0];P.delete(e.pointerId);
+    if(P.size===0&&st&&st.pts.length===1&&s===1&&urls.length>1&&p0){const dx=e.clientX-p0.x;if(Math.abs(dx)>70)load(idx+(dx<0?1:-1));}
+    if(s<=1.01&&P.size===0)fit();st={s,tx,ty,pts:[...P.values()].map(p=>({...p}))};};
+  v.addEventListener('pointerup',up);v.addEventListener('pointercancel',up);
+  load(idx);}
+
+/* ---------- 新增／編輯 ---------- */
+let F=null,FID=null,FIMGS=[],FNEW=new Set(),FMSG='',FBUSY=false;
+async function viewEdit(id,share){
+  if(!F||FID!==(id||'new')){FID=id||'new';
+    if(id){const c=cardById(id);if(!c){$('#main').innerHTML='<div class="empty">找不到這筆資料。</div>';return;}F=JSON.parse(JSON.stringify(c));}
+    else{F=newCard();}
+    FNEW=new Set();FIMGS=[];FMSG='';for(const i of F.images)FIMGS.push({id:i,data:await getImg(i)});}
+  $('#ttl').textContent=id?'編輯':'新增';renderForm();
+  if(share){history.replaceState(null,'','#/new');const fs=await takeShared();if(fs.length)handleFiles(fs);else setMsg('沒有收到分享的檔案。');}}
+function setMsg(t){FMSG=t;const el=$('#fMsg');if(el){el.textContent=t;el.style.display=t?'':'none';}}
+function renderForm(){const m=$('#main');const isNew=FID==='new';const cats=CATS.includes(F.cat)||!F.cat?CATS:[...CATS,F.cat];
+  const shows=[...new Set(CARDS.map(c=>c.show).filter(Boolean))],evs=[...new Set(CARDS.map(c=>c.event).filter(Boolean))],spk=[...new Set(CARDS.flatMap(c=>c.speakers))];
+  const srcTxt={'圖上':'圖上印的日期','檔案':'檔案日期，不一定是節目當天','手動':'自己填的'}[F.dateSrc]||'';
+  m.innerHTML=`${isNew?`<div class="sec"><div class="st">選檔案</div>
+    <div class="note" style="margin:0 0 6px">一頁圖：可以一次選多張，一張一筆。簡報：選一份 PDF，整份算一筆。</div>
+    <div class="btns" style="margin-top:0"><label class="btn pri">＋選一頁圖<input type="file" accept="image/*" multiple id="fImg" hidden></label><label class="btn pri">＋選簡報 PDF<input type="file" accept="application/pdf,.pdf" id="fPdf" hidden></label></div></div>`:''}
+  <div class="prog" id="fMsg" style="${FMSG?'':'display:none'}">${esc(FMSG)}</div>
+  ${FIMGS.length?`<div class="thumbs">${FIMGS.slice(0,6).map(o=>`<img src="${o.data}" alt="">`).join('')}${FIMGS.length>6?`<div class="note">…共 ${FIMGS.length} 頁</div>`:''}</div>
+    <div class="note" style="margin-top:0">${typeName(F)}${F.fileName?'・'+esc(F.fileName):''}${F.mind?`・AI 看法與思路圖已產生（${esc(F.mindBy)}）`:''}</div>
+    <div class="btns" style="margin-top:4px"><button class="btn sm" id="fAi">${F.mind?'AI 重新分析':'AI 分析'}</button></div>`:''}
+  <div class="grid2"><div><label class="f">日期 <span class="req">＊</span></label><input type="date" id="fDate" value="${esc(F.date)}"><label class="chk"><input type="checkbox" id="fApx" ${F.dateApprox?'checked':''}>約（不確定是節目當天）</label></div>
+  <div><label class="f">分類 <span class="req">＊</span></label><select id="fCat"><option value="">請選擇</option>${cats.map(c=>`<option ${c===F.cat?'selected':''}>${esc(c)}</option>`).join('')}<option value="__new__">＋新增分類…</option></select></div></div>
+  ${srcTxt?`<div class="note">日期來源：${srcTxt}</div>`:''}
+  <label class="f">主旨 <span class="req">＊</span></label><input type="text" id="fTitle" value="${esc(F.title)}">
+  <label class="f">節目 <span class="hint">例：財經皓角</span></label><input type="text" id="fShow" list="dlShow" value="${esc(F.show)}"><datalist id="dlShow">${shows.map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
+  <label class="f">發言人 <span class="hint">多位用「、」分隔；很多人就填「多人」</span></label><input type="text" id="fSpk" list="dlSpk" value="${esc(F.speakers.join('、'))}"><datalist id="dlSpk">${spk.map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
+  <label class="f">事件標籤 <span class="hint">可不填，例：2026-11 萬點崩盤</span></label><input type="text" id="fEv" list="dlEv" value="${esc(F.event)}"><datalist id="dlEv">${evs.map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
+  <div class="grid2">${F.type==='deck'?`<div><label class="f">來源數</label><input type="number" min="0" id="fSrc" value="${esc(F.srcCount)}" placeholder="例：7"></div>`:''}
+  <div style="${F.type==='deck'?'':'grid-column:1/3'}"><label class="f">原始影片連結 <span class="hint">可不填</span></label><input type="url" id="fUrl" value="${esc(F.url)}" placeholder="https://"></div></div>
+  <div class="btns" style="margin-top:16px"><button class="btn pri" id="fSave" style="flex:1">儲存</button><button class="btn" id="fCancel">取消</button></div>
+  ${isNew?'':`<div class="btns"><button class="btn dan" id="fDel">刪除這筆</button></div>`}`;
+  if($('#fImg'))$('#fImg').onchange=e=>{const fs=[...e.target.files];e.target.value='';if(fs.length)handleFiles(fs);};
+  if($('#fPdf'))$('#fPdf').onchange=e=>{const fs=[...e.target.files];e.target.value='';if(fs.length)handleFiles(fs);};
+  $('#fDate').onchange=e=>{F.date=e.target.value;F.dateSrc='手動';};$('#fApx').onchange=e=>F.dateApprox=e.target.checked;
+  $('#fTitle').oninput=e=>F.title=e.target.value;$('#fShow').oninput=e=>F.show=e.target.value;
+  $('#fSpk').oninput=e=>F.speakers=splitNames(e.target.value);$('#fEv').oninput=e=>F.event=e.target.value;$('#fUrl').oninput=e=>F.url=e.target.value.trim();
+  if($('#fSrc'))$('#fSrc').oninput=e=>F.srcCount=e.target.value;
+  $('#fCat').onchange=e=>{if(e.target.value==='__new__'){const n=(prompt('新分類名稱')||'').trim();F.cat=n||'';renderForm();}else F.cat=e.target.value;};
+  if($('#fAi'))$('#fAi').onclick=()=>runAiForm(true);
+  $('#fSave').onclick=saveForm;$('#fCancel').onclick=()=>{F=null;FID=null;history.length>1?history.back():(location.hash='#/home');};
+  if($('#fDel'))$('#fDel').onclick=()=>delCard(cardById(F.id));}
+async function handleFiles(files){if(FBUSY){toast('還在處理上一批，請稍候');return;}
+  const pdf=files.find(f=>f.type==='application/pdf'||/\.pdf$/i.test(f.name));const imgs=files.filter(f=>/^image\//.test(f.type));
+  if(pdf)return loadPdf(pdf);
+  if(!imgs.length){alert('只支援圖片或 PDF。');return;}
+  if(imgs.length>1)return batchImport(imgs);
+  return loadSingle(imgs[0]);}
+async function loadSingle(f){FBUSY=true;try{setMsg('處理圖片中…');const d=await compress(f);const keep=F.id;
+    F=newCard();F.id=keep;F.type='img';F.fileName=f.name;F.date=fileDate(f);F.dateApprox=true;F.dateSrc='檔案';
+    const id=uid();FIMGS=[{id,data:d}];FNEW=new Set([id]);setMsg('');renderForm();}
+  catch(e){setMsg('');alert('圖片讀取失敗：'+f.name);FBUSY=false;return;}
+  FBUSY=false;if(aiOn())runAiForm(false);}
+async function loadPdf(f){FBUSY=true;try{setMsg('讀取 PDF 中…');const pages=await pdfToImages(f,(i,n)=>setMsg(`轉換簡報頁面 ${i}／${n}…`));
+    const keep=F.id;F=newCard();F.id=keep;F.type='deck';F.fileName=f.name;F.title=stripExt(f.name);F.date=fileDate(f);F.dateApprox=true;F.dateSrc='檔案';
+    FIMGS=pages.map(d=>({id:uid(),data:d}));FNEW=new Set(FIMGS.map(o=>o.id));setMsg('');renderForm();}
+  catch(e){setMsg('PDF 讀取失敗：'+(e.message||e));FBUSY=false;return;}
+  FBUSY=false;if(aiOn())runAiForm(false);}
+async function runAiForm(force){if(!aiOn()){alert('請先到設定頁填寫 Gemini 或 Claude 的金鑰。');return;}if(!FIMGS.length)return;
+  const form=F;FBUSY=true;if($('#fAi'))$('#fAi').disabled=true;
+  setMsg(`AI 分析中…${FIMGS.length>5?`（${FIMGS.length} 頁，約需 1 分鐘）`:''}`);
+  try{const {by,r}=await aiAnalyze(FIMGS.map(o=>o.data),F.type,F.fileName);if(F!==form)return;
+    applyAI(F,r,by,force);setMsg(`AI（${by}）已填入主旨、日期、AI 看法與思路圖，請確認後儲存。`);renderForm();}
+  catch(e){if(F===form){setMsg('AI 分析失敗：'+e.message+'。可以先自己填，儲存後再到檢視頁產生思路圖。');if($('#fAi'))$('#fAi').disabled=false;}}
+  finally{FBUSY=false;}}
+function applyAI(c,r,by,force){
+  if(r.title&&(!c.title||(force&&c.type==='img')))c.title=String(r.title).trim();
+  const d=normDate(r.date);if(d&&c.dateSrc!=='手動'){c.date=d;c.dateApprox=false;c.dateSrc='圖上';}
+  if(r.show&&!c.show)c.show=String(r.show).trim();
+  const sp=Array.isArray(r.speakers)?r.speakers.map(x=>String(x).trim()).filter(Boolean):splitNames(r.speakers);if(sp.length&&!c.speakers.length)c.speakers=sp;
+  if(!c.cat&&CATS.includes(r.category))c.cat=r.category;
+  if(r.mind){c.mind=r.mind;c.mindBy=by;c.mindAt=today();}
+  if(r.view&&r.view.length){c.view=r.view;c.viewBy=by;c.viewAt=today();}}
+function dupOf(c){return CARDS.find(x=>x.id!==c.id&&((c.fileName&&x.fileName===c.fileName)||(x.date===c.date&&x.title.trim()===c.title.trim())));}
+async function saveForm(){if(FBUSY&&!confirm('AI 還在分析，現在儲存就不會帶入 AI 的結果。仍要儲存？'))return;
+  F.title=F.title.trim();F.show=F.show.trim();F.event=F.event.trim();const miss=[];if(!F.date)miss.push('日期');if(!F.cat)miss.push('分類');if(!F.title)miss.push('主旨');
+  if(miss.length){alert('請填寫：'+miss.join('、'));return;}
+  if(FID==='new'&&!FIMGS.length&&!confirm('還沒有選圖片或 PDF，仍要儲存？'))return;
+  const dp=dupOf(F);if(dp&&!confirm(`可能重複：已有一筆「${dp.date}｜${dp.title}」${dp.fileName&&dp.fileName===F.fileName?'（同檔名）':''}。仍要儲存？`))return;
+  if(!CATS.includes(F.cat)){CATS.push(F.cat);await saveCats();}
+  const keep=new Set(FIMGS.map(o=>o.id));for(const o of FIMGS)if(FNEW.has(o.id))await putImg(o.id,o.data);
+  const old=cardById(F.id);if(old)for(const i of old.images)if(!keep.has(i)){await DB.del('images',i);IMG.delete(i);}
+  F.images=FIMGS.map(o=>o.id);const c=F;F=null;FID=null;await saveCard(c);toast('已儲存');location.hash='#/view/'+c.id;}
+async function delCard(c){if(!c||!confirm('刪除「'+c.title+'」？\n手機和 Google Sheets 上的資料都會刪除，無法復原。'))return;
+  for(const i of c.images){await DB.del('images',i);IMG.delete(i);}await DB.del('cards',c.id);CARDS=CARDS.filter(x=>x.id!==c.id);queueDelete(c.id);
+  F=null;FID=null;toast('已刪除');location.hash='#/home';}
+async function batchImport(files){
+  const dups=files.filter(f=>CARDS.some(c=>c.fileName===f.name));let list=files;
+  if(dups.length&&confirm(`其中 ${dups.length} 張已經匯入過（同檔名）。要略過這些嗎？\n按「取消」＝全部再匯入一次。`))list=files.filter(f=>!dups.includes(f));
+  if(!list.length){toast('沒有新的圖片');return;}
+  if(!confirm(`建立 ${list.length} 筆一頁圖（一張一筆）${aiOn()?'，並用 AI 產生主旨、日期和思路圖':''}？\n建好後請逐筆確認分類和主旨。`))return;
+  FBUSY=true;let ok=0,aiFail=0;
+  try{for(let i=0;i<list.length;i++){const f=list[i];setMsg(`處理第 ${i+1}／${list.length} 張…`);
+    let d;try{d=await compress(f);}catch(e){continue;}
+    const c=newCard();c.type='img';c.fileName=f.name;c.date=fileDate(f);c.dateApprox=true;c.dateSrc='檔案';
+    const id=uid();await putImg(id,d);c.images=[id];
+    if(aiOn()){setMsg(`AI 分析第 ${i+1}／${list.length} 張…`);try{const {by,r}=await aiAnalyze([d],'img',f.name);applyAI(c,r,by,true);}catch(e){aiFail++;}}
+    if(!c.title)c.title=stripExt(f.name)||'（待補主旨）';if(!c.cat)c.cat=FC&&CATS.includes(FC)?FC:CATS[0];
+    await saveCard(c);ok++;}}
+  finally{FBUSY=false;setMsg('');}
+  F=null;FID=null;alert(`已建立 ${ok} 筆。${aiFail?`其中 ${aiFail} 筆 AI 分析失敗，主旨暫用檔名，可到檢視頁按「產生思路圖」。`:''}`);location.hash='#/home';}
+function compress(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const MX=2400;let w=im.width,h=im.height;
+  if(Math.max(w,h)>MX){const k=MX/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k);}const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0,w,h);res(cv.toDataURL('image/jpeg',0.85));};im.onerror=rej;im.src=r.result;};r.onerror=rej;r.readAsDataURL(file);});}
+function shrink(dataUrl,MX,q){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>{let w=im.width,h=im.height;if(Math.max(w,h)>MX){const k=MX/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k);}
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0,w,h);res(cv.toDataURL('image/jpeg',q).split(',')[1]);};im.onerror=rej;im.src=dataUrl;});}
+
+/* ---------- PDF ---------- */
+const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/';
+let pdfLib=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('PDF 元件下載失敗（請確認網路）'));document.head.appendChild(s);});}
+async function pdfToImages(file,onProg){
+  if(!pdfLib)pdfLib=loadScript(PDFJS+'pdf.min.js').then(()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';});
+  try{await pdfLib;}catch(e){pdfLib=null;throw e;}
+  const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const out=[];
+  for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const v0=p.getViewport({scale:1});const sc=Math.min(3,1600/Math.max(v0.width,v0.height));const vp=p.getViewport({scale:sc});
+    const cv=document.createElement('canvas');cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);
+    await p.render({canvasContext:g,viewport:vp}).promise;out.push(cv.toDataURL('image/jpeg',0.8));p.cleanup();onProg&&onProg(i,pdf.numPages);}
+  pdf.destroy();return out;}
+
+/* ---------- AI（Gemini 為主，Claude 備援） ---------- */
+const aiOn=()=>!!(AI.gemini||AI.claude);
+function buildPrompt(type,n,fileName){
+  const what=type==='deck'?`一份 ${n} 頁的財經簡報（檔名：${fileName||'未知'}），圖片依頁序排列`:'一張財經節目的一頁整理圖';
+  return `以下是${what}。請只根據圖上的內容回答，不要加入圖上沒有的觀點、數字或人名，也不要給投資建議。全部用繁體中文，只輸出一個 JSON 物件，不要其他文字：
+{"title":"主旨：20 字內，說出核心觀點","date":"圖上印出的日期，格式 YYYY-MM-DD；圖上沒有印日期就填空字串，不要猜","show":"圖上明確寫出的節目或頻道名稱，沒有就空字串","speakers":["圖上明確寫出姓名的發言人或分析師；沒有就空陣列"],"category":"從［${CATS.join('、')}］選一個最符合的","mind":{"observe":"他們看到的現象，一句","explain":[{"point":"他們的一個解釋或主張，短句","verify":"這個解釋要靠什麼證據驗證"}],"conclusion":"他們的結論，一句","premises":["結論成立需要、但圖上沒有明講的前提，1 到 3 條，寫成可以被挑戰的句子"]},"view":["最站得住：哪個說法有數據或邏輯支撐","最弱的一環：哪個推論缺證據，或把假設當事實","接下來看什麼：一兩個可以驗證的訊號"]}
+explain 寫 2 到 4 條，照他們推論的順序。
+view 是你自己的簡短看法，3 到 5 行，每行 30 字內，依序寫最站得住的一點、最弱的一環、接下來看什麼；可以指出圖上數字或推論的問題，但不要給買賣建議。`;}
+function parseAI(t){t=String(t||'').replace(/```json|```/g,'');const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw new Error('AI 回覆不是 JSON');
+  const r=JSON.parse(t.slice(a,b+1));if(!r.mind||!r.mind.conclusion)throw new Error('AI 回覆缺少思路圖');
+  r.mind.explain=(r.mind.explain||[]).filter(x=>x&&x.point);r.mind.premises=(r.mind.premises||[]).filter(Boolean);
+  r.view=(Array.isArray(r.view)?r.view:String(r.view||'').split(/\n+/)).map(x=>String(x).trim()).filter(Boolean).slice(0,5);return r;}
+async function callGemini(prompt,b64s){
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(AI.gModel||'gemini-flash-latest')}:generateContent?key=${encodeURIComponent(AI.gemini)}`;
+  const body={contents:[{parts:[{text:prompt},...b64s.map(d=>({inline_data:{mime_type:'image/jpeg',data:d}}))]}],generationConfig:{temperature:0.2,responseMimeType:'application/json'}};
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(r.status===429?'次數上限（429），稍後再試':((j.error&&j.error.message)||('HTTP '+r.status)).slice(0,160));
+  const t=(((j.candidates||[])[0]||{}).content||{}).parts;if(!t)throw new Error('沒有回覆內容');return t.map(p=>p.text||'').join('');}
+async function callClaude(prompt,b64s){
+  const body={model:AI.cModel||'claude-sonnet-5-5',max_tokens:4000,messages:[{role:'user',content:[...b64s.map(d=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:d}})),{type:'text',text:prompt}]}]};
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.claude,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(((j.error&&j.error.message)||('HTTP '+r.status)).slice(0,160));
+  return (j.content||[]).map(p=>p.text||'').join('');}
+async function aiAnalyze(dataUrls,type,fileName){
+  const big=type==='deck'?1100:1600;const b64s=[];for(const d of dataUrls)b64s.push(await shrink(d,big,0.75));
+  const prompt=buildPrompt(type,dataUrls.length,fileName);const errs=[];
+  if(AI.gemini){try{return {by:'Gemini',r:parseAI(await callGemini(prompt,b64s))};}catch(e){errs.push('Gemini：'+e.message);}}
+  if(AI.claude){try{return {by:'Claude',r:parseAI(await callClaude(prompt,b64s))};}catch(e){errs.push('Claude：'+e.message);}}
+  if(!errs.length)throw new Error('尚未設定 AI 金鑰');throw new Error(errs.join('；'));}
+async function testAI(which){toast('測試中…');try{const t=which==='g'?await callGemini('只回覆 OK 兩個字',[]):await callClaude('只回覆 OK 兩個字',[]);alert((which==='g'?'Gemini':'Claude')+' 連線成功：'+String(t).trim().slice(0,30));}
+  catch(e){alert((which==='g'?'Gemini':'Claude')+' 失敗：'+(e.message==='Failed to fetch'?'網路連線失敗':e.message));}}
+
+/* ---------- 從手機分享進來 ---------- */
+async function takeShared(){const out=[];try{const cache=await caches.open('finview-share');const ks=await cache.keys();
+  for(const k of ks){const r=await cache.match(k);const b=await r.blob();out.push(new File([b],decodeURIComponent(r.headers.get('x-name')||'shared'),{type:r.headers.get('content-type')||b.type,lastModified:+(r.headers.get('x-lm')||Date.now())}));await cache.delete(k);}}catch(e){}
+  return out;}
+
+/* ---------- 雲端同步（Google Sheets + Drive） ---------- */
+let SYNC={url:'',token:'',queue:[],del:[],catsDirty:false,imgs:[],last:0,lastErr:''};
+let flushing=false,flushTimer=null;
+const saveSync=()=>DB.put('kv',{k:'sync',v:SYNC});
+const syncOn=()=>!!(SYNC.url&&SYNC.token);
+const pendingCount=()=>SYNC.queue.length+SYNC.del.length+(SYNC.catsDirty?1:0);
+function queueCard(id){if(!SYNC.queue.slice(flushing?1:0).includes(id))SYNC.queue.push(id);SYNC.del=SYNC.del.filter(x=>x!==id);saveSync();scheduleFlush();}
+function queueDelete(id){SYNC.queue=SYNC.queue.filter((x,i)=>x!==id||(flushing&&i===0));if(!SYNC.del.includes(id))SYNC.del.push(id);saveSync();scheduleFlush();}
+function scheduleFlush(ms){clearTimeout(flushTimer);flushTimer=setTimeout(flush,ms==null?1200:ms);}
+async function api(action,data){
+  const r=await fetch(SYNC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({token:SYNC.token,action},data||{}))});
+  const t=await r.text();let j;
+  try{j=JSON.parse(t);}catch(e){throw new Error('連不上 Apps Script（請確認網址正確，且「誰可以存取」設為「所有人」）');}
+  if(!j.ok)throw new Error(j.error||'失敗');return j;}
+const cardOut=c=>{const o=Object.assign({},c);return o;};
+async function flush(){
+  if(flushing||!syncOn()||!navigator.onLine||!pendingCount())return;flushing=true;updateSyncUI();
+  try{
+    while(SYNC.del.length){await api('deleteCard',{id:SYNC.del[0]});SYNC.del.shift();await saveSync();}
+    if(SYNC.catsDirty){await api('putCats',{cats:CATS});SYNC.catsDirty=false;await saveSync();}
+    while(SYNC.queue.length){const c=cardById(SYNC.queue[0]);
+      if(c){const have=new Set(SYNC.imgs);const need=c.images.filter(i=>!have.has(i));
+        for(let k=0;k<need.length;k+=3){const part=[];for(const iid of need.slice(k,k+3)){const d=await getImg(iid);if(d)part.push({id:iid,data:d});}
+          if(part.length){await api('putImages',{images:part});part.forEach(x=>SYNC.imgs.push(x.id));await saveSync();}}
+        await api('putCard',{card:cardOut(c)});}
+      SYNC.queue.shift();await saveSync();updateSyncUI();}
+    SYNC.last=Date.now();SYNC.lastErr='';await saveSync();
+  }catch(e){SYNC.lastErr=(e&&e.message==='Failed to fetch')?'網路連線失敗':(e.message||String(e));await saveSync();}
+  finally{flushing=false;updateSyncUI();if(!SYNC.lastErr&&pendingCount())scheduleFlush(300);}}
+function hhmm(t){const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function syncText(){if(!syncOn())return '雲端：未設定';const n=pendingCount();
+  if(flushing)return `雲端：上傳中…（剩 ${n} 筆）`;
+  if(SYNC.lastErr&&n)return `雲端：上傳失敗，待上傳 ${n} 筆`;
+  if(n)return `雲端：待上傳 ${n} 筆${navigator.onLine?'':'（離線）'}`;
+  return SYNC.last?`雲端：已備份 ${hhmm(SYNC.last)}`:'雲端：已連接';}
+function syncBanner(){
+  if(!syncOn())return `<div class="alert">尚未連接 Google Sheets。資料目前只存在這支手機的瀏覽器，清除瀏覽資料就會消失。 <a class="btn sm" href="#/settings">去設定</a></div>`;
+  if(SYNC.lastErr&&pendingCount())return `<div class="alert">有 ${pendingCount()} 筆尚未備份到 Google Sheets：${esc(SYNC.lastErr)} <button class="btn sm" data-retry>重新上傳</button></div>`;
+  return '';}
+function updateSyncUI(){document.querySelectorAll('[data-sync]').forEach(el=>el.textContent=syncText());
+  document.querySelectorAll('[data-syncbanner]').forEach(el=>{if(location.hash.startsWith('#/history'))return;el.innerHTML=syncBanner();bindRetry(el);});}
+function bindRetry(root){root.querySelectorAll('[data-retry]').forEach(b=>b.onclick=()=>{SYNC.lastErr='';updateSyncUI();flush();});}
+function enqueueAll(resetImgs){if(resetImgs)SYNC.imgs=[];SYNC.queue=CARDS.map(c=>c.id);SYNC.catsDirty=true;SYNC.lastErr='';saveSync();scheduleFlush(100);}
+async function restoreCloud(){
+  if(!syncOn()){alert('請先在設定頁填寫 Apps Script 網址與通行碼。');return;}
+  if(CARDS.length&&!confirm(`以 Google Sheets 的資料取代這支手機上的全部資料（目前 ${CARDS.length} 筆）？`))return;
+  toast('下載資料中…');let j;
+  try{j=await api('listAll');}catch(e){alert('還原失敗：'+e.message);return;}
+  if(!j.cards.length){alert('Google Sheets 裡還沒有資料。');return;}
+  await DB.clear('cards');await DB.clear('images');IMG.clear();CARDS=[];
+  for(const c of j.cards){const n=normCard(c);await DB.put('cards',n);CARDS.push(n);}
+  if(Array.isArray(j.cats)&&j.cats.length){CATS=j.cats;await DB.put('kv',{k:'cats',v:CATS});}
+  const ids=[...new Set(CARDS.flatMap(c=>c.images))];const got=[];
+  for(let i=0;i<ids.length;i+=3){const part=ids.slice(i,i+3);
+    try{const r=await api('getImages',{ids:part});for(const im of r.images){await putImg(im.id,im.data);got.push(im.id);}}catch(e){}
+    toast(`下載圖片 ${Math.min(i+3,ids.length)}／${ids.length}`,4000);}
+  SYNC.queue=[];SYNC.del=[];SYNC.catsDirty=false;SYNC.imgs=got;SYNC.last=Date.now();SYNC.lastErr='';await saveSync();
+  location.hash='#/home';route();const fail=ids.length-got.length;
+  if(fail)alert(`已還原 ${CARDS.length} 筆，但有 ${fail} 張圖片下載失敗。可到設定頁再按一次「從 Google Sheets 還原」。`);else toast('還原完成：'+CARDS.length+' 筆');}
+async function testConnect(){toast('連線中…');let j;
+  try{j=await api('ping');}catch(e){alert('連線失敗：'+(e.message==='Failed to fetch'?'網路連線失敗，或網址不正確':e.message));return;}
+  SYNC.lastErr='';await saveSync();
+  if(j.count===0&&CARDS.length){toast(`連線成功，開始上傳 ${CARDS.length} 筆`);enqueueAll(true);}
+  else if(j.count>0&&!CARDS.length){if(confirm(`連線成功。Google Sheets 有 ${j.count} 筆資料，要還原到這支手機嗎？`))return restoreCloud();}
+  else if(j.count>0&&CARDS.length){if(confirm(`連線成功。Google Sheets 有 ${j.count} 筆、手機有 ${CARDS.length} 筆。\n要把手機資料上傳合併嗎？（同一筆以手機為準）`))enqueueAll(false);}
+  else toast('連線成功');
+  viewSettings();}
+function gasCode(){return GAS_CODE.replace('__TOKEN__',String(SYNC.token).replace(/\\/g,'\\\\').replace(/'/g,"\\'"));}
+
+/* ---------- 設定 ---------- */
+function viewSettings(){$('#ttl').textContent='設定';const m=$('#main');const used={};CARDS.forEach(c=>used[c.cat]=(used[c.cat]||0)+1);
+  m.innerHTML=`<div class="sec"><div class="st">AI 金鑰<small>只存在這支手機，不會上傳</small></div>
+    <label class="f">Gemini API 金鑰 <span class="hint">主要使用</span></label><input type="password" id="aiG" value="${esc(AI.gemini)}" autocomplete="off">
+    <label class="f">Gemini 模型 <span class="hint">預設 gemini-flash-latest（自動用最新版）</span></label><input type="text" id="aiGM" value="${esc(AI.gModel)}" autocomplete="off">
+    <label class="f">Claude API 金鑰 <span class="hint">Gemini 失敗時改用</span></label><input type="password" id="aiC" value="${esc(AI.claude)}" autocomplete="off">
+    <label class="f">Claude 模型</label><input type="text" id="aiCM" value="${esc(AI.cModel)}" autocomplete="off">
+    <div class="btns"><button class="btn pri" id="aiSave">儲存</button><button class="btn" id="aiTG">測試 Gemini</button><button class="btn" id="aiTC">測試 Claude</button></div>
+    <div class="note">清除瀏覽資料後金鑰要重新填，請另外記下來。</div></div>
+  <div class="sec"><div class="st">Google Sheets 備份</div>
+    <div style="font-weight:700" data-sync>${syncText()}</div>${SYNC.lastErr?`<div class="alert">${esc(SYNC.lastErr)}</div>`:''}
+    <label class="f">通行碼 <span class="hint">自己訂，要和 Apps Script 裡的一樣</span></label><input type="text" id="syTok" value="${esc(SYNC.token)}" autocomplete="off">
+    <label class="f">Apps Script 網址 <span class="hint">部署後取得，以 /exec 結尾</span></label><input type="text" id="syUrl" value="${esc(SYNC.url)}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+    <div class="btns"><button class="btn pri" id="sySave">儲存並測試連線</button><button class="btn" id="syCode">複製 Apps Script 程式碼</button></div>
+    ${syncOn()?`<div class="btns"><button class="btn" id="syNow">立即同步</button><button class="btn" id="syAll">全部重新上傳</button><button class="btn dan" id="syRestore">從 Google Sheets 還原</button></div>`:''}
+    <div class="note">圖片存在 Google Drive「財經觀點庫圖片」資料夾，資料存在試算表「觀點資料」分頁。每次儲存會自動上傳；沒有網路時先存在手機，連線後自動補傳。</div></div>
+  <div class="sec cats"><div class="st">分類</div><ul>${CATS.map((c,i)=>`<li><span class="nm">${esc(c)}</span><span class="note" style="margin:0">${used[c]||0} 筆</span><button class="btn sm" data-up="${i}">↑</button><button class="btn sm" data-ren="${i}">改名</button><button class="btn sm dan" data-cdel="${i}">刪除</button></li>`).join('')}</ul><button class="btn sm" id="catAdd">＋新增分類</button></div>
+  <div class="sec"><div class="st">備份檔（手動）</div><div class="note" id="stor">　</div>
+    <div class="btns"><button class="btn" id="bk">下載備份檔</button><label class="btn dan">從備份檔還原<input type="file" accept=".json,application/json" id="rsFile" hidden></label></div></div>
+  <div class="ver">財經觀點庫 ${APP_VERSION}</div>`;
+  const readAI=()=>{AI.gemini=$('#aiG').value.trim();AI.claude=$('#aiC').value.trim();AI.gModel=$('#aiGM').value.trim()||'gemini-flash-latest';AI.cModel=$('#aiCM').value.trim()||'claude-sonnet-5-5';};
+  $('#aiSave').onclick=async()=>{readAI();await saveAI();toast('已儲存');};
+  $('#aiTG').onclick=async()=>{readAI();await saveAI();if(!AI.gemini){alert('請先填 Gemini 金鑰');return;}testAI('g');};
+  $('#aiTC').onclick=async()=>{readAI();await saveAI();if(!AI.claude){alert('請先填 Claude 金鑰');return;}testAI('c');};
+  $('#sySave').onclick=async()=>{const u=$('#syUrl').value.trim(),t=$('#syTok').value.trim();
+    if(!u||!t){alert('請填寫通行碼和網址。');return;}
+    if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(u)){alert('網址格式不對，應為 https://script.google.com/macros/s/…/exec');return;}
+    SYNC.url=u;SYNC.token=t;await saveSync();await testConnect();};
+  $('#syCode').onclick=async()=>{const t=$('#syTok').value.trim();if(!t){alert('請先填寫通行碼，複製的程式碼會自動帶入。');return;}SYNC.token=t;await saveSync();
+    try{await navigator.clipboard.writeText(gasCode());toast('已複製（已帶入通行碼）');}catch(e){const b=document.createElement('div');b.className='modal';b.innerHTML='<div class="box"><textarea style="min-height:50vh"></textarea><div class="btns"><button class="btn">關閉</button></div></div>';b.querySelector('textarea').value=gasCode();b.querySelector('button').onclick=()=>b.remove();document.body.appendChild(b);}};
+  if($('#syNow'))$('#syNow').onclick=()=>{SYNC.lastErr='';if(!pendingCount())toast('沒有待上傳的資料');else{toast('同步中…');flush();}};
+  if($('#syAll'))$('#syAll').onclick=()=>{if(confirm(`重新上傳全部 ${CARDS.length} 筆（含圖片）？`)){enqueueAll(true);toast('開始上傳');}};
+  if($('#syRestore'))$('#syRestore').onclick=restoreCloud;
+  const re=async()=>{await saveCats();viewSettings();};
+  $('#catAdd').onclick=()=>{const n=(prompt('新分類名稱')||'').trim();if(n&&!CATS.includes(n)){CATS.push(n);re();}};
+  m.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{const i=+b.dataset.up;if(i>0){[CATS[i-1],CATS[i]]=[CATS[i],CATS[i-1]];re();}});
+  m.querySelectorAll('[data-ren]').forEach(b=>b.onclick=async()=>{const i=+b.dataset.ren,o=CATS[i];const n=(prompt('改成（輸入已有的分類＝合併）',o)||'').trim();if(!n||n===o)return;
+    for(const c of CARDS)if(c.cat===o){c.cat=n;await saveCard(c);}if(CATS.includes(n))CATS.splice(i,1);else CATS[i]=n;re();});
+  m.querySelectorAll('[data-cdel]').forEach(b=>b.onclick=()=>{const i=+b.dataset.cdel;if(used[CATS[i]]){alert(`有 ${used[CATS[i]]} 筆資料使用「${CATS[i]}」，請先用「改名」合併到其他分類。`);return;}if(confirm('刪除分類「'+CATS[i]+'」？')){CATS.splice(i,1);re();}});
+  $('#bk').onclick=backup;$('#rsFile').onchange=async e=>{const f=e.target.files[0];if(f)await restoreFile(await f.text());};
+  (async()=>{let p=false,u=0;try{p=await navigator.storage.persisted();u=(await navigator.storage.estimate()).usage||0;}catch(e){}
+    const el=$('#stor');if(el)el.textContent=`手機已使用約 ${(u/1048576).toFixed(1)} MB｜永久儲存：${p?'已取得':'未取得'}。Chrome「清除瀏覽資料」仍會刪除手機上的資料，所以請務必連接 Google Sheets。`;})();}
+async function backup(){toast('打包中…');const o={app:'finance-views',kind:'backup',appVersion:APP_VERSION,exportedAt:new Date().toISOString(),cats:CATS,cards:CARDS,images:await DB.all('images')};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=`財經觀點庫備份_${today()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);}
+async function restoreFile(txt){let j;try{j=JSON.parse(txt);}catch(e){alert('備份檔無法讀取。');return;}
+  if(!j||j.app!=='finance-views'||!Array.isArray(j.cards)){alert('這不是財經觀點庫的備份檔。');return;}
+  if(!confirm(`還原會取代這支手機上的全部資料。\n備份日期：${(j.exportedAt||'').slice(0,10)}，共 ${j.cards.length} 筆。確定還原？`))return;
+  await DB.clear('cards');await DB.clear('images');IMG.clear();for(const i of j.images||[])await DB.put('images',i);
+  CARDS=[];for(const c of j.cards){const n=normCard(c);await DB.put('cards',n);CARDS.push(n);}
+  if(Array.isArray(j.cats)&&j.cats.length){CATS=j.cats;await DB.put('kv',{k:'cats',v:CATS});}
+  if(syncOn())enqueueAll(true);toast('還原完成：'+CARDS.length+' 筆');location.hash='#/home';route();}
+
+/* ---------- 啟動 ---------- */
+async function init(){await openDB();
+  const cs=await DB.get('kv','cats');if(cs&&Array.isArray(cs.v)&&cs.v.length)CATS=cs.v;
+  const sy=await DB.get('kv','sync');if(sy)SYNC=Object.assign(SYNC,sy.v);
+  const ai=await DB.get('kv','ai');if(ai)AI=Object.assign(AI,ai.v);
+  CARDS=(await DB.all('cards')).map(normCard);
+  $('#backBtn').onclick=()=>{F=null;FID=null;history.length>1?history.back():(location.hash='#/home');};
+  window.addEventListener('hashchange',route);route();
+  window.addEventListener('online',()=>{updateSyncUI();flush();});window.addEventListener('offline',updateSyncUI);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')flush();});flush();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});}
+const GAS_CODE="// 財經觀點庫 雲端同步（Google Sheets + Google Drive）v1.1.0\n// 只需修改下一行的通行碼，必須和 APP 設定頁填的通行碼完全相同。\nconst TOKEN = '__TOKEN__';\n\nconst SHEET = '觀點資料';\nconst META = '設定';\nconst FOLDER = '財經觀點庫圖片';\nconst HEAD = ['id', '日期', '日期約', '類型', '分類', '主旨', '節目', '發言人', '事件', '來源數', '影片連結',\n  '事後評分', '我的想法', 'AI看法', '思路圖', 'AI', '狀態', '更新時間', '檔名', '頁數', '圖片連結', '資料（程式用，請勿修改）'];\nconst NC = HEAD.length;\n\nfunction doGet() { return out({ ok: true, msg: '財經觀點庫雲端同步已啟用' }); }\n\nfunction doPost(e) {\n  let req;\n  try { req = JSON.parse(e.postData.contents); } catch (err) { return out({ ok: false, error: '資料格式錯誤' }); }\n  if (!TOKEN || TOKEN === '__TOKEN__' || req.token !== TOKEN) return out({ ok: false, error: '通行碼錯誤' });\n  const lock = LockService.getScriptLock();\n  lock.waitLock(30000);\n  try {\n    switch (req.action) {\n      case 'ping': return out({ ok: true, count: Math.max(0, sheet_().getLastRow() - 1) });\n      case 'putImages': putImages_(req.images || []); return out({ ok: true });\n      case 'putCard': putCard_(req.card); return out({ ok: true });\n      case 'deleteCard': deleteCard_(req.id); return out({ ok: true });\n      case 'putCats': meta_().getRange(1, 1, 1, 2).setNumberFormat('@').setValues([['cats', JSON.stringify(req.cats || [])]]); return out({ ok: true });\n      case 'listAll': return out(listAll_());\n      case 'getImages': return out({ ok: true, images: getImages_(req.ids || []) });\n    }\n    return out({ ok: false, error: '未知的動作' });\n  } catch (err) {\n    return out({ ok: false, error: String((err && err.message) || err) });\n  } finally {\n    lock.releaseLock();\n  }\n}\n\nfunction out(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\n\nfunction sheet_() {\n  const ss = SpreadsheetApp.getActive();\n  let sh = ss.getSheetByName(SHEET);\n  if (!sh) {\n    sh = ss.insertSheet(SHEET, 0);\n    sh.getRange(1, 1, 1, NC).setValues([HEAD]).setFontWeight('bold');\n    sh.setFrozenRows(1);\n  }\n  return sh;\n}\n\nfunction meta_() { const ss = SpreadsheetApp.getActive(); return ss.getSheetByName(META) || ss.insertSheet(META); }\n\nfunction folder_() {\n  const p = PropertiesService.getScriptProperties();\n  const id = p.getProperty('folder');\n  if (id) { try { const f = DriveApp.getFolderById(id); if (!f.isTrashed()) return f; } catch (e) {} }\n  const f = DriveApp.createFolder(FOLDER);\n  p.setProperty('folder', f.getId());\n  return f;\n}\n\nfunction findRow_(sh, id) {\n  if (sh.getLastRow() < 2) return 0;\n  const r = sh.getRange(2, 1, sh.getLastRow() - 1, 1).createTextFinder(id).matchEntireCell(true).findNext();\n  return r ? r.getRow() : 0;\n}\n\nfunction fileOf_(folder, id) {\n  const it = folder.getFilesByName(id + '.jpg');\n  while (it.hasNext()) { const f = it.next(); if (!f.isTrashed()) return f; }\n  return null;\n}\n\n// 避免以 = + - @ 開頭的文字被試算表當成公式\nfunction safe_(v) { v = v == null ? '' : String(v); return /^[=+\\-@]/.test(v) ? \"'\" + v : v; }\n\nfunction putImages_(images) {\n  const folder = folder_();\n  images.forEach(function (im) {\n    if (fileOf_(folder, im.id)) return;\n    folder.createFile(Utilities.newBlob(Utilities.base64Decode(String(im.data).split(',')[1]), 'image/jpeg', im.id + '.jpg'));\n  });\n}\n\nfunction mindText_(m) {\n  if (!m) return '';\n  const L = [];\n  if (m.observe) L.push('看到：' + m.observe);\n  (m.explain || []).forEach(function (x, i) { L.push('解釋' + (i + 1) + '：' + x.point + (x.verify ? '（要驗證：' + x.verify + '）' : '')); });\n  if (m.conclusion) L.push('結論：' + m.conclusion);\n  (m.premises || []).forEach(function (p) { L.push('沒講出來的前提：' + p); });\n  return L.join('\\n');\n}\n\nfunction putCard_(c) {\n  if (!c || !c.id) throw new Error('缺少資料');\n  const sh = sheet_(), folder = folder_();\n  let row = findRow_(sh, c.id);\n  if (row) {\n    const keep = {};\n    (c.images || []).forEach(function (x) { keep[x] = 1; });\n    let old = {};\n    try { old = JSON.parse(sh.getRange(row, NC).getDisplayValue()) || {}; } catch (e) {}\n    (old.images || []).forEach(function (iid) {\n      if (!keep[iid]) { const f = fileOf_(folder, iid); if (f) f.setTrashed(true); }\n    });\n  } else {\n    row = sh.getLastRow() + 1;\n  }\n  const links = (c.images || []).map(function (iid) { const f = fileOf_(folder, iid); return f ? f.getUrl() : ''; }).filter(String).join('\\n');\n  const now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');\n  const notes = (c.notes || []).map(function (n) { return n.d + '　' + n.t; }).join('\\n');\n  const v = [c.id, c.date, c.dateApprox ? '約' : '', c.type === 'deck' ? '簡報' : '一頁圖', c.cat, c.title, c.show,\n    (c.speakers || []).join('、'), c.event, c.srcCount || '', c.url, c.rating, notes, (c.view || []).join('\\n'), mindText_(c.mind), c.mindBy || '',\n    c.archived ? '歷史' : '進行中', now, c.fileName, (c.images || []).length, links, JSON.stringify(c)].map(safe_);\n  sh.getRange(row, 1, 1, NC).setNumberFormat('@').setValues([v]);\n}\n\nfunction deleteCard_(id) {\n  const sh = sheet_();\n  const row = findRow_(sh, id);\n  if (!row) return;\n  const folder = folder_();\n  let old = {};\n  try { old = JSON.parse(sh.getRange(row, NC).getDisplayValue()) || {}; } catch (e) {}\n  (old.images || []).forEach(function (iid) { const f = fileOf_(folder, iid); if (f) f.setTrashed(true); });\n  sh.deleteRow(row);\n}\n\nfunction listAll_() {\n  const sh = sheet_();\n  const cards = [];\n  const last = sh.getLastRow();\n  if (last >= 2) {\n    sh.getRange(2, NC, last - 1, 1).getDisplayValues().forEach(function (r) {\n      try { const c = JSON.parse(r[0]); if (c && c.id) cards.push(c); } catch (e) {}\n    });\n  }\n  let cats = null;\n  try { const v = meta_().getRange(1, 2).getDisplayValue(); if (v) cats = JSON.parse(v); } catch (e) {}\n  return { ok: true, cards: cards, cats: cats };\n}\n\nfunction getImages_(ids) {\n  const folder = folder_();\n  const list = [];\n  ids.forEach(function (id) {\n    const f = fileOf_(folder, id);\n    if (f) list.push({ id: id, data: 'data:image/jpeg;base64,' + Utilities.base64Encode(f.getBlob().getBytes()) });\n  });\n  return list;\n}\n";
+init().catch(e=>{document.getElementById('main').innerHTML='<div class="alert">啟動失敗：'+esc(e.message)+'</div>';});
+</script>
+</body>
+</html>
