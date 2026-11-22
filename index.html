@@ -72,7 +72,8 @@ label.f .req{color:var(--red)} label.f .hint{font-weight:500;color:var(--ink2);f
 .cats ul{list-style:none;padding:0;margin:4px 0}.cats .nm{flex:1;font-weight:700}
 .vmeta{color:var(--ink2);font-size:14px;font-weight:700;margin-top:4px}
 .vmeta i{font-style:normal;color:var(--amb)}
-.vt{font-size:19px;line-height:1.4;margin:4px 0 6px}
+.vt{font-size:19px;line-height:1.4;margin:4px 0 6px;cursor:pointer}
+.vte{font-size:13px;color:var(--act);border:1.5px solid var(--act);border-radius:6px;padding:0 6px;vertical-align:3px;white-space:nowrap}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:14px;margin:4px 0 8px}
 .kv b{color:var(--ink2)} .kv span{font-weight:700;word-break:break-all}
 .kv a{color:var(--act)}
@@ -122,7 +123,7 @@ label.f .req{color:var(--red)} label.f .hint{font-weight:500;color:var(--ink2);f
 </nav>
 <script>
 'use strict';
-const APP_VERSION='v1.3.0';
+const APP_VERSION='v1.4.0';
 const DEFAULT_CATS=['市場判讀','總經利率','產業','個股','投資心法'];
 const RATES=['說中','部分','沒說中','還看不出'];
 let CARDS=[],CATS=DEFAULT_CATS.slice();
@@ -221,7 +222,7 @@ async function viewCard(id){const c=cardById(id);const m=$('#main');if(!c){m.inn
     (VGRID?`<div class="pgrid">${urls.map((u,i)=>`<button data-pg="${i}" class="${i===VPAGE?'on':''}"><img src="${u}" alt="" loading="lazy"><b>${i+1}</b></button>`).join('')}</div>`:`<img class="big" id="bigImg" src="${urls[VPAGE]}" alt="">`);}
   else imgH=`<img class="big" id="bigImg" src="${urls[0]}" alt="">`;
   m.innerHTML=`<div class="vmeta">${esc(c.date)}${c.dateApprox?'<i>（約）</i>':''}・${esc(c.cat)}・${typeName(c)}${c.type==='deck'?`・${n} 頁`:''}</div>
-  <h2 class="vt">${esc(c.title)}</h2>
+  <div id="vtBox"><h2 class="vt" id="vtH">${esc(c.title)} <span class="vte">✎ 改</span></h2></div>
   <div class="kv">${c.show?`<b>節目</b><span>${esc(c.show)}</span>`:''}${sp?`<b>發言人</b><span>${esc(sp)}</span>`:''}${c.event?`<b>事件</b><span>${esc(c.event)}</span>`:''}${c.srcCount?`<b>來源數</b><span>${esc(c.srcCount)} 個</span>`:''}${c.url?`<b>影片</b><span><a href="${esc(c.url)}" target="_blank" rel="noopener">開啟原始影片</a></span>`:''}</div>
   ${imgH}
   <div class="aiv"><div class="h"><span>AI 看法${c.view.length?`・${esc(c.viewBy||c.mindBy)}${c.viewAt?'・'+esc(c.viewAt):''}`:''}</span><button id="vPaste">貼上</button><button id="vGen">${c.view.length?'重新產生':'產生'}</button></div>
@@ -233,6 +234,10 @@ async function viewCard(id){const c=cardById(id);const m=$('#main');if(!c){m.inn
   <div class="sec"><div class="st">思路圖<small>${c.mind?`AI 整理・${esc(c.mindBy)}${c.mindAt?'・'+esc(c.mindAt):''}`:''}</small></div><div id="mmBox">${c.mind?mindHtml(c.mind):'<div class="note" style="margin:0">還沒有思路圖。</div>'}</div>
     <div class="note" id="mmMsg" style="display:none"></div><div class="btns"><button class="btn" id="mmGen">${c.mind?'重新產生':'產生思路圖'}</button></div></div>
   <div class="btns"><a class="btn" href="#/edit/${c.id}">編輯資料</a><button class="btn" id="vArch">${c.archived?'移回首頁':'移到歷史'}</button></div>`;
+  $('#vtH').onclick=()=>{const box=$('#vtBox');box.innerHTML=`<input type="text" id="vtI" style="font-size:17px;font-weight:700;margin:4px 0"><div class="btns" style="margin:0 0 6px"><button class="btn pri sm" id="vtS">儲存主旨</button><button class="btn sm" id="vtC">取消</button></div>`;
+    const inp=$('#vtI');inp.value=c.title;inp.focus();inp.select();
+    const save=async()=>{const t=inp.value.trim();if(!t){alert('主旨不能空白');return;}if(t!==c.title){c.title=t;await saveCard(c);toast('主旨已更新');}viewCard(id);};
+    $('#vtS').onclick=save;$('#vtC').onclick=()=>viewCard(id);inp.onkeydown=e=>{if(e.key==='Enter')save();};};
   const big=$('#bigImg');if(big)big.onclick=()=>openViewer(c,urls,c.type==='deck'?VPAGE:0);
   if($('#pPrev')){$('#pPrev').onclick=()=>{VPAGE=(VPAGE-1+n)%n;viewCard(id);};$('#pNext').onclick=()=>{VPAGE=(VPAGE+1)%n;viewCard(id);};$('#pGrid').onclick=()=>{VGRID=!VGRID;viewCard(id);};}
   m.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{VPAGE=+b.dataset.pg;VGRID=false;viewCard(id);});
@@ -376,7 +381,7 @@ async function saveForm(){if(FBUSY&&!confirm('AI 還在分析，現在儲存就�
   if(!CATS.includes(F.cat)){CATS.push(F.cat);await saveCats();}
   const keep=new Set(FIMGS.map(o=>o.id));for(const o of FIMGS)if(FNEW.has(o.id))await putImg(o.id,o.data);
   const old=cardById(F.id);if(old)for(const i of old.images)if(!keep.has(i)){await DB.del('images',i);IMG.delete(i);}
-  F.images=FIMGS.map(o=>o.id);const c=F;F=null;FID=null;await saveCard(c);toast('已儲存');location.hash='#/view/'+c.id;}
+  F.images=FIMGS.map(o=>o.id);const c=F;F=null;FID=null;await saveCard(c);toast('已儲存');location.hash=c.archived?'#/history':'#/home';}
 async function delCard(c){if(!c||!confirm('刪除「'+c.title+'」？\n手機和 Google Sheets 上的資料都會刪除，無法復原。'))return;
   for(const i of c.images){await DB.del('images',i);IMG.delete(i);}await DB.del('cards',c.id);CARDS=CARDS.filter(x=>x.id!==c.id);queueDelete(c.id);
   F=null;FID=null;toast('已刪除');location.hash='#/home';}
