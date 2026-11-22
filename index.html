@@ -33,6 +33,7 @@ nav.bot a.on{color:var(--act);box-shadow:inset 0 3px 0 var(--act)}
 .row .d{flex:none;color:var(--ink2);font-size:13px;font-variant-numeric:tabular-nums}
 .row .d i{font-style:normal;color:var(--amb);font-weight:700;margin-left:1px}
 .row .c{flex:none;background:var(--ink);color:#fff;border-radius:5px;padding:0 6px;font-size:13px;font-weight:700}
+.row .jn{flex:none;color:var(--amb);font-weight:700;font-size:14px;margin-left:-3px}
 .row .t{flex:1;font-size:15px;font-weight:700;line-height:1.4}
 .bdg{display:inline-block;border:1.5px solid var(--ink2);border-radius:5px;padding:0 5px;font-size:12px;font-weight:700;margin-left:5px;vertical-align:1px;color:var(--ink2)}
 .rt-說中{border-color:var(--grn);color:var(--grn);background:var(--grnbg)}
@@ -123,7 +124,7 @@ label.f .req{color:var(--red)} label.f .hint{font-weight:500;color:var(--ink2);f
 </nav>
 <script>
 'use strict';
-const APP_VERSION='v1.4.0';
+const APP_VERSION='v1.5.0';
 const DEFAULT_CATS=['市場判讀','總經利率','產業','個股','投資心法'];
 const RATES=['說中','部分','沒說中','還看不出'];
 let CARDS=[],CATS=DEFAULT_CATS.slice();
@@ -202,7 +203,7 @@ function renderList(hist){const base=CARDS.filter(c=>!!c.archived===hist);
   let h='';
   if(FS||FP){const t={};RATES.forEach(r=>t[r]=0);let none=0;res.forEach(c=>c.rating?t[c.rating]++:none++);
     h+=`<div class="tally">${esc(FP||FS)}｜說中 ${t['說中']}・部分 ${t['部分']}・沒說中 ${t['沒說中']}・還看不出 ${t['還看不出']}・未評 ${none}</div>`;}
-  h+=res.map(c=>`<button class="row" data-open="${c.id}"><span class="d">${esc(c.date.slice(2))}${c.type==='deck'?'<i>簡</i>':''}</span><span class="c">${esc(c.cat)}</span><span class="t">${esc(c.title)}${c.type==='deck'?`<span class="bdg">${c.images.length}頁</span>`:''}${c.rating?`<span class="bdg rt-${c.rating}">${c.rating}</span>`:''}</span></button>`).join('');
+  h+=res.map(c=>`<button class="row" data-open="${c.id}"><span class="d">${esc(c.date.slice(2))}</span><span class="c">${esc(c.cat)}</span>${c.type==='deck'?'<span class="jn">簡</span>':''}<span class="t">${esc(c.title)}${c.type==='deck'?`<span class="bdg">${c.images.length}頁</span>`:''}${c.rating?`<span class="bdg rt-${c.rating}">${c.rating}</span>`:''}</span></button>`).join('');
   if(!res.length)h+=`<div class="empty">${base.length?'沒有符合的資料。':hist?'歷史區還沒有資料。開啟一筆資料後按「移到歷史」，就會收到這裡。':'還沒有資料。'}</div>`;
   if(!hist&&!CARDS.length)h+=`<div class="btns">${syncOn()?'<button class="btn pri" id="cloudRestore">從 Google Sheets 還原</button>':''}<a class="btn ${syncOn()?'':'pri'}" href="#/new">新增第一筆</a></div>`;
   h+=`<div class="ver">${APP_VERSION}｜首頁 ${CARDS.filter(c=>!c.archived).length} 筆・歷史 ${CARDS.filter(c=>c.archived).length} 筆<br><span data-sync>${syncText()}</span></div>`;
@@ -233,7 +234,7 @@ async function viewCard(id){const c=cardById(id);const m=$('#main');if(!c){m.inn
     <textarea id="nTxt" placeholder="${c.notes.length?'事後看：…':'我的判斷：…'}"></textarea><div class="btns" style="margin-top:6px"><button class="btn pri" id="nAdd">加一句</button></div></div>
   <div class="sec"><div class="st">思路圖<small>${c.mind?`AI 整理・${esc(c.mindBy)}${c.mindAt?'・'+esc(c.mindAt):''}`:''}</small></div><div id="mmBox">${c.mind?mindHtml(c.mind):'<div class="note" style="margin:0">還沒有思路圖。</div>'}</div>
     <div class="note" id="mmMsg" style="display:none"></div><div class="btns"><button class="btn" id="mmGen">${c.mind?'重新產生':'產生思路圖'}</button></div></div>
-  <div class="btns"><a class="btn" href="#/edit/${c.id}">編輯資料</a><button class="btn" id="vArch">${c.archived?'移回首頁':'移到歷史'}</button></div>`;
+  <div class="btns"><a class="btn" href="#/edit/${c.id}">編輯資料</a><button class="btn" id="vArch">${c.archived?'移回首頁':'移到歷史'}</button><button class="btn dan" id="vDel">刪除</button></div>`;
   $('#vtH').onclick=()=>{const box=$('#vtBox');box.innerHTML=`<input type="text" id="vtI" style="font-size:17px;font-weight:700;margin:4px 0"><div class="btns" style="margin:0 0 6px"><button class="btn pri sm" id="vtS">儲存主旨</button><button class="btn sm" id="vtC">取消</button></div>`;
     const inp=$('#vtI');inp.value=c.title;inp.focus();inp.select();
     const save=async()=>{const t=inp.value.trim();if(!t){alert('主旨不能空白');return;}if(t!==c.title){c.title=t;await saveCard(c);toast('主旨已更新');}viewCard(id);};
@@ -244,6 +245,7 @@ async function viewCard(id){const c=cardById(id);const m=$('#main');if(!c){m.inn
   m.querySelectorAll('[data-rate]').forEach(b=>b.onclick=async()=>{const r=b.dataset.rate;c.rating=c.rating===r?'':r;c.ratedAt=c.rating?today():'';await saveCard(c);viewCard(id);});
   $('#nAdd').onclick=async()=>{const t=$('#nTxt').value.trim();if(!t){toast('請先寫一句');return;}c.notes.push({d:today(),t});await saveCard(c);toast('已加入');viewCard(id);};
   m.querySelectorAll('[data-ndel]').forEach(b=>b.onclick=async()=>{if(!confirm('刪除這一句？'))return;c.notes.splice(+b.dataset.ndel,1);await saveCard(c);viewCard(id);});
+  $('#vDel').onclick=()=>delCard(c);
   $('#vArch').onclick=async()=>{c.archived=!c.archived;await saveCard(c);toast(c.archived?'已移到歷史區':'已移回首頁');location.hash=c.archived?'#/history':'#/home';};
   const regen=async(btnId,msgId)=>{if(!aiOn()){alert('請先到設定頁填寫 Gemini 或 Claude 的金鑰。');return;}
     let keepView=false;
