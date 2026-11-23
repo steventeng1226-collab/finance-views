@@ -14,6 +14,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.5 "Noto
 button,input,select,textarea{font:inherit;color:inherit}
 header.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:8px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
 header.top h1{font-size:17px;margin:0;flex:1;font-weight:700}
+header.top h1 .tv{font-size:12px;font-weight:500;opacity:.75;margin-left:4px}
 header.top .back{background:none;border:0;color:#fff;font-size:22px;padding:0 8px 0 0;line-height:1}
 main{padding:8px 12px calc(76px + env(safe-area-inset-bottom,0px));max-width:760px;margin:0 auto}
 nav.bot{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1.5px solid var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -124,7 +125,7 @@ label.f .req{color:var(--red)} label.f .hint{font-weight:500;color:var(--ink2);f
 </nav>
 <script>
 'use strict';
-const APP_VERSION='v1.5.0';
+const APP_VERSION='v1.6.0';
 const DEFAULT_CATS=['市場判讀','總經利率','產業','個股','投資心法'];
 const RATES=['說中','部分','沒說中','還看不出'];
 let CARDS=[],CATS=DEFAULT_CATS.slice();
@@ -181,7 +182,7 @@ function route(){const[,r,id]=(location.hash||'#/home').split('/');
   return viewList(false);}
 
 /* ---------- 清單 ---------- */
-function viewList(hist){$('#ttl').textContent=hist?'歷史區':'財經觀點庫';const m=$('#main');
+function viewList(hist){$('#ttl').innerHTML=`${hist?'歷史區':'財經觀點庫'} <span class="tv">${APP_VERSION}</span>`;const m=$('#main');
   m.innerHTML=`<div data-syncbanner>${hist?'':syncBanner()}</div>${hist||aiOn()?'':'<div class="info">尚未設定 AI 金鑰，新增時不會自動產生主旨和思路圖。 <a class="btn sm" href="#/settings">去設定</a></div>'}
   <div class="search"><input type="search" id="q" placeholder="搜尋主旨、節目、發言人、想法、思路圖…" value="${esc(Q)}" enterkeyhint="search"></div>
   <div class="chips" id="chips"></div><div class="filt" id="filt"></div><div id="list"></div>`;
@@ -206,7 +207,7 @@ function renderList(hist){const base=CARDS.filter(c=>!!c.archived===hist);
   h+=res.map(c=>`<button class="row" data-open="${c.id}"><span class="d">${esc(c.date.slice(2))}</span><span class="c">${esc(c.cat)}</span>${c.type==='deck'?'<span class="jn">簡</span>':''}<span class="t">${esc(c.title)}${c.type==='deck'?`<span class="bdg">${c.images.length}頁</span>`:''}${c.rating?`<span class="bdg rt-${c.rating}">${c.rating}</span>`:''}</span></button>`).join('');
   if(!res.length)h+=`<div class="empty">${base.length?'沒有符合的資料。':hist?'歷史區還沒有資料。開啟一筆資料後按「移到歷史」，就會收到這裡。':'還沒有資料。'}</div>`;
   if(!hist&&!CARDS.length)h+=`<div class="btns">${syncOn()?'<button class="btn pri" id="cloudRestore">從 Google Sheets 還原</button>':''}<a class="btn ${syncOn()?'':'pri'}" href="#/new">新增第一筆</a></div>`;
-  h+=`<div class="ver">${APP_VERSION}｜首頁 ${CARDS.filter(c=>!c.archived).length} 筆・歷史 ${CARDS.filter(c=>c.archived).length} 筆<br><span data-sync>${syncText()}</span></div>`;
+  h+=`<div class="ver">首頁 ${CARDS.filter(c=>!c.archived).length} 筆・歷史 ${CARDS.filter(c=>c.archived).length} 筆<br><span data-sync>${syncText()}</span></div>`;
   const L=$('#list');L.innerHTML=h;L.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>location.hash='#/view/'+b.dataset.open);
   if($('#cloudRestore'))$('#cloudRestore').onclick=restoreCloud;}
 
